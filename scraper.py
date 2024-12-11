@@ -4,6 +4,8 @@
 # rikujjs
 
 
+import os
+from dotenv import load_dotenv
 import pickle
 from bs4 import BeautifulSoup
 from time import sleep
@@ -41,12 +43,15 @@ months_dict = {
 
 page_cache = {}
 
+load_dotenv()
+
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_experimental_option("detach", True)
 
-service = Service("/home/lc/tools/bin/chromedriver")
+service = Service(os.environ["CHROMEDRIVER_PATH"])
 
 driver = None
+
 
 class Scraper:
 
@@ -145,7 +150,12 @@ class Scraper:
                     if "Hz" in spec:
                         self.datastorage["Clockrate"] = spec.strip()
                     elif "core" in spec.lower():
-                        self.datastorage["Cores"] = spec.replace("cores", "").replace("core", "").replace(" ", "").strip()
+                        self.datastorage["Cores"] = (
+                            spec.replace("cores", "")
+                            .replace("core", "")
+                            .replace(" ", "")
+                            .strip()
+                        )
                     elif "socket" in spec.lower():
                         self.datastorage["Socket"] = spec.strip()
                     elif "fsb" in spec.lower():
@@ -157,7 +167,7 @@ class Scraper:
                         or "l4" in spec.lower()
                     ):
                         self.datastorage["Cache"] = spec.strip()
-                    else: 
+                    else:
                         pass
                         # print(spec)
                         # print(self.url)
@@ -218,7 +228,6 @@ if __name__ == "__main__":
     # write header
     output.write(",".join(column_headers))
     output.write("\n")
-
 
     for type in type_list:
         # loop the games from starting_id to end.
